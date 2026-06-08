@@ -67,7 +67,7 @@ export default function App() {
     if (tab === 'create') return <ComposerScreen onPosted={() => { setFeedRefreshKey((value) => value + 1); setTab('home'); }} />;
     if (tab === 'activity') return <ActivityScreen />;
     if (tab === 'profile') return <ProfileScreen profile={profile} onProfileChanged={refreshProfile} />;
-    return <HomeScreen currentProfile={profile} refreshKey={feedRefreshKey} />;
+    return <HomeScreen currentProfile={profile} refreshKey={feedRefreshKey} onCompose={() => setTab('create')} />;
   }, [authLoading, feedRefreshKey, profile, refreshProfile, session, tab]);
 
   return (
@@ -141,7 +141,7 @@ function AuthScreen({ loading }: { loading: boolean }) {
   );
 }
 
-function HomeScreen({ currentProfile, refreshKey }: { currentProfile: Profile | null; refreshKey: number }) {
+function HomeScreen({ currentProfile, refreshKey, onCompose }: { currentProfile: Profile | null; refreshKey: number; onCompose: () => void }) {
   const [feed, setFeed] = useState<FeedBundle>(emptyFeed);
   const [followingPosts, setFollowingPosts] = useState<Post[]>([]);
   const [mode, setMode] = useState<FeedMode>('forYou');
@@ -176,7 +176,7 @@ function HomeScreen({ currentProfile, refreshKey }: { currentProfile: Profile | 
       data={posts}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <PostCard post={item} onChanged={() => void load(true)} />}
-      ListHeaderComponent={<><ComposerPrompt profile={currentProfile} /><FeedTabs selected={mode} onSelect={setMode} />{mode === 'forYou' ? <TrendingStrip tags={feed.trendingHashtags} /> : null}</>}
+      ListHeaderComponent={<><ComposerPrompt profile={currentProfile} onPress={onCompose} /><FeedTabs selected={mode} onSelect={setMode} />{mode === 'forYou' ? <TrendingStrip tags={feed.trendingHashtags} /> : null}</>}
       ListEmptyComponent={<StateView title={mode === 'following' ? 'No following posts yet' : 'No posts yet'} message={mode === 'following' ? 'Posts from people you follow will appear here.' : 'Create the first post in your community.'} />}
       refreshControl={<RefreshControl refreshing={state === 'refreshing'} onRefresh={() => void load(true)} tintColor={colors.primary} />}
       contentContainerStyle={posts.length === 0 ? styles.listEmpty : undefined}
@@ -360,8 +360,8 @@ function EditProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () =
   return <Card compact><Text style={styles.title}>Edit profile</Text><TextInput style={styles.input} placeholder="Username" placeholderTextColor={colors.muted} value={username} onChangeText={setUsername} autoCapitalize="none" /><TextInput style={styles.input} placeholder="Display name" placeholderTextColor={colors.muted} value={displayName} onChangeText={setDisplayName} /><TextInput style={styles.input} placeholder="Bio" placeholderTextColor={colors.muted} value={bio} onChangeText={setBio} multiline maxLength={160} /><TextInput style={styles.input} placeholder="Avatar image URL" placeholderTextColor={colors.muted} value={avatarUrl} onChangeText={setAvatarUrl} autoCapitalize="none" /><TextInput style={styles.input} placeholder="Banner image URL" placeholderTextColor={colors.muted} value={bannerUrl} onChangeText={setBannerUrl} autoCapitalize="none" />{usernameLocked ? <Text style={styles.statusText}>Username changes are limited to once every 30 days. You can change it again on {nextUsernameDate?.toLocaleDateString()}.</Text> : null}<PrimaryButton label={saving ? 'Saving…' : 'Save profile'} onPress={() => void save()} disabled={saving} />{message ? <Text style={styles.statusText}>{message}</Text> : null}</Card>;
 }
 
-function ComposerPrompt({ profile }: { profile: Profile | null }) {
-  return <View style={styles.prompt}><Avatar profile={profile} size={40} /><Text style={styles.promptText}>What’s happening?</Text></View>;
+function ComposerPrompt({ profile, onPress }: { profile: Profile | null; onPress: () => void }) {
+  return <TouchableOpacity style={styles.prompt} onPress={onPress} accessibilityRole="button"><Avatar profile={profile} size={40} /><Text style={styles.promptText}>What’s happening?</Text></TouchableOpacity>;
 }
 
 function PostComposer({ expanded, onPosted }: { expanded?: boolean; onPosted?: () => void }) {
