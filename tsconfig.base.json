@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@media/types": [
+        "packages/types/src"
+      ],
+      "@media/api": [
+        "packages/api/src"
+      ],
+      "@media/design-system": [
+        "packages/design-system/src"
+      ]
+    },
+    "ignoreDeprecations": "6.0"
+  }
+}

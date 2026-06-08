@@ -1,0 +1,5 @@
+import { currentProfile } from '@media/api';
+import { PostList } from '../../components/Feed';
+import { ProtectedRoute } from '../../components/ProtectedRoute';
+import { Shell } from '../../components/Shell';
+export default function ProfilePage() { return <Shell title="Profile"><header className="topbar"><h1>{currentProfile.displayName} <span className="badge">✓</span></h1><p className="muted">@{currentProfile.username}</p></header><ProtectedRoute><section className="panel"><div style={{ height: 180, borderRadius: 24, background: 'linear-gradient(135deg, #4f8cff, #8f6bff)' }} /><div className="row space" style={{ marginTop: -24 }}><div className="row"><img className="avatar" src={currentProfile.avatarUrl} alt="" style={{ width: 92, height: 92, border: '4px solid var(--bg)' }} /><div><h2>{currentProfile.displayName}</h2><p>{currentProfile.bio}</p></div></div><button className="ghost">Edit profile</button></div><p className="muted">{currentProfile.followersCount.toLocaleString()} followers · {currentProfile.followingCount.toLocaleString()} following · Privacy · Delete account</p></section><PostList /></ProtectedRoute></Shell>; }

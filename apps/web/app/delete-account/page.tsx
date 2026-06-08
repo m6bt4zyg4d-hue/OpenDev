@@ -1,0 +1,2 @@
+import { Shell } from '../../components/Shell';
+export default function DeleteAccountPage() { return <Shell title="Delete account"><header className="topbar"><h1>Delete account</h1></header><section className="panel"><p>Users can request account deletion, export data, revoke sessions, and remove personal profile content from this flow.</p><button className="ghost">Request deletion</button></section></Shell>; }

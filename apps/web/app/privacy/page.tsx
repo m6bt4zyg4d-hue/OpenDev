@@ -1,0 +1,2 @@
+import { Shell } from '../../components/Shell';
+export default function PrivacyPage() { return <Shell title="Privacy"><header className="topbar"><h1>Privacy policy</h1></header><section className="panel"><p>Media stores account, profile, post, message, moderation, and support data in Supabase. Production deployments should replace this placeholder with counsel-approved policy text.</p></section></Shell>; }
