@@ -588,3 +588,183 @@ select '00000000-0000-0000-0000-000000000101', id, 'seed/banner.jpg', 'https://i
 from public.profiles
 where username = 'mediafounder'
 on conflict do nothing;
+
+-- Production hardening additions from post-merge audit.
+create type ad_status as enum ('draft', 'active', 'paused', 'ended');
+
+create table public.sponsored_posts (
+  id uuid primary key default gen_random_uuid(),
+  post_id uuid not null references public.posts(id) on delete cascade,
+  sponsor_name text not null,
+  status ad_status not null default 'draft',
+  starts_at timestamptz not null default now(),
+  ends_at timestamptz,
+  pinned boolean not null default false,
+  budget_cents integer not null default 0 check (budget_cents >= 0),
+  created_by uuid references public.profiles(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create view public.following_feed as
+select pf.*
+from public.post_feed pf
+join public.follows f on f.following_id = pf.author_id and f.follower_id = auth.uid()
+where pf.visibility = 'public';
+
+create view public.promoted_feed as
+select pf.*, sp.id as sponsored_post_id, sp.sponsor_name, sp.pinned
+from public.sponsored_posts sp
+join public.post_feed pf on pf.id = sp.post_id
+where sp.status = 'active'
+  and sp.starts_at <= now()
+  and (sp.ends_at is null or sp.ends_at > now());
+
+create or replace function public.get_admin_dashboard_metrics()
+returns table(open_reports bigint, active_bans bigint, pending_moderation bigint, active_ads bigint)
+language sql security definer set search_path = public as $$
+  select
+    (select count(*) from public.reports where status in ('open','reviewing')) as open_reports,
+    (select count(*) from public.bans where revoked_at is null and (ends_at is null or ends_at > now())) as active_bans,
+    (select count(*) from public.moderation_queue where status in ('pending','escalated')) as pending_moderation,
+    (select count(*) from public.sponsored_posts where status = 'active' and starts_at <= now() and (ends_at is null or ends_at > now())) as active_ads
+  where public.is_staff();
+$$;
+
+create or replace function public.heuristic_moderation_score(content text)
+returns numeric language sql immutable as $$
+  select case
+    when content ~* '(child sexual|terrorist|kill yourself|nazi|racial slur)' then 0.98
+    when content ~* '(nsfw|nude|porn|hate|scam|spam|abuse|harass)' then 0.86
+    when length(content) > 0 then 0.08
+    else 0.01
+  end;
+$$;
+
+create or replace function public.enqueue_text_moderation()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  score numeric;
+  target text;
+begin
+  target := tg_table_name;
+  score := public.heuristic_moderation_score(new.body);
+  insert into public.moderation_queue (target_type, target_id, status, ai_score, ai_reason)
+  values (
+    case when target = 'posts' then 'post' else 'comment' end,
+    new.id,
+    case when score >= 0.8 then 'escalated'::moderation_status else 'approved'::moderation_status end,
+    score,
+    case when score >= 0.8 then 'Automated moderation flagged possible spam, NSFW, hate, harassment, or self-harm content.' else 'Automated moderation found low risk.' end
+  );
+  new.moderation_status := case when score >= 0.8 then 'escalated'::moderation_status else 'approved'::moderation_status end;
+  return new;
+end;
+$$;
+
+drop trigger if exists posts_enqueue_text_moderation on public.posts;
+create trigger posts_enqueue_text_moderation before insert or update of body on public.posts for each row execute function public.enqueue_text_moderation();
+drop trigger if exists comments_enqueue_text_moderation on public.comments;
+create trigger comments_enqueue_text_moderation before insert or update of body on public.comments for each row execute function public.enqueue_text_moderation();
+
+create trigger sponsored_posts_touch_updated before update on public.sponsored_posts for each row execute function public.touch_updated_at();
+create index sponsored_posts_status_window_idx on public.sponsored_posts (status, starts_at, ends_at);
+create index sponsored_posts_pinned_idx on public.sponsored_posts (pinned) where pinned;
+
+alter table public.sponsored_posts enable row level security;
+create policy "Active sponsored posts are readable" on public.sponsored_posts for select using (status = 'active' or public.is_staff());
+create policy "Staff manage sponsored posts" on public.sponsored_posts for all using (public.is_staff()) with check (public.is_staff());
+create policy "Users delete own posts" on public.posts for delete using (author_id = auth.uid() or public.is_staff());
+create policy "Users link own post media" on public.post_media for insert with check (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()));
+create policy "Users manage own post media" on public.post_media for delete using (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()));
+create policy "Conversation creators create conversations" on public.conversations for insert with check (created_by = auth.uid());
+create policy "Conversation members read conversation rows" on public.conversations for select using (exists (select 1 from public.conversation_members cm where cm.conversation_id = id and cm.user_id = auth.uid()) or public.is_staff());
+create policy "Conversation creators add members" on public.conversation_members for insert with check (exists (select 1 from public.conversations c where c.id = conversation_id and c.created_by = auth.uid()) or user_id = auth.uid());
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('media', 'media', true, 104857600, array['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm','video/quicktime'])
+on conflict (id) do update set public = excluded.public, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+
+create policy "Media files are publicly readable" on storage.objects for select using (bucket_id = 'media');
+create policy "Users upload own media files" on storage.objects for insert with check (bucket_id = 'media' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy "Users update own media files" on storage.objects for update using (bucket_id = 'media' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy "Users delete own media files" on storage.objects for delete using (bucket_id = 'media' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create or replace view public.post_feed with (security_invoker = true) as
+select
+  p.id,
+  p.author_id,
+  p.body,
+  p.post_type,
+  p.visibility,
+  p.quote_post_id,
+  p.moderation_status,
+  p.like_count,
+  p.comment_count,
+  p.repost_count,
+  p.bookmark_count,
+  p.created_at,
+  pr.username,
+  pr.display_name,
+  pr.avatar_url,
+  pr.banner_url,
+  pr.bio,
+  pr.verified,
+  pr.followers_count,
+  pr.following_count,
+  pr.posts_count,
+  coalesce(jsonb_agg(jsonb_build_object('id', m.id, 'ownerId', m.owner_id, 'url', m.url, 'type', m.media_type, 'altText', m.alt_text, 'width', m.width, 'height', m.height, 'durationSeconds', m.duration_seconds) order by pm.position) filter (where m.id is not null), '[]'::jsonb) as media
+from public.posts p
+join public.profiles pr on pr.id = p.author_id
+left join public.post_media pm on pm.post_id = p.id
+left join public.media m on m.id = pm.media_id
+where p.moderation_status in ('approved','pending')
+group by p.id, pr.id;
+
+create or replace view public.bookmark_feed with (security_invoker = true) as
+select pf.*, b.user_id as bookmarked_by, b.created_at as bookmarked_at
+from public.bookmarks b
+join public.post_feed pf on pf.id = b.post_id
+where b.user_id = auth.uid();
+
+create or replace view public.story_feed with (security_invoker = true) as
+select
+  s.id,
+  s.author_id,
+  s.caption,
+  s.moderation_status,
+  s.expires_at,
+  s.created_at,
+  pr.username,
+  pr.display_name,
+  pr.avatar_url,
+  pr.banner_url,
+  pr.bio,
+  pr.verified,
+  pr.followers_count,
+  pr.following_count,
+  pr.posts_count,
+  jsonb_build_object('id', m.id, 'ownerId', m.owner_id, 'url', m.url, 'type', m.media_type, 'altText', m.alt_text, 'width', m.width, 'height', m.height, 'durationSeconds', m.duration_seconds) as media,
+  exists (select 1 from public.story_views sv where sv.story_id = s.id and sv.viewer_id = auth.uid()) as viewed
+from public.stories s
+join public.profiles pr on pr.id = s.author_id
+join public.media m on m.id = s.media_id
+where s.moderation_status in ('approved','pending');
+
+create or replace view public.conversation_list with (security_invoker = true) as
+select
+  c.id,
+  c.title,
+  c.is_group,
+  c.created_by,
+  c.created_at,
+  c.updated_at,
+  coalesce(jsonb_agg(distinct jsonb_build_object('id', p.id, 'username', p.username, 'displayName', p.display_name, 'avatarUrl', p.avatar_url, 'verified', p.verified, 'followersCount', p.followers_count, 'followingCount', p.following_count, 'postsCount', p.posts_count)) filter (where p.id is not null), '[]'::jsonb) as participants,
+  greatest(0, count(m.id) filter (where m.created_at > coalesce(me.last_read_at, 'epoch'::timestamptz) and m.sender_id <> auth.uid()))::int as unread_count,
+  (select jsonb_build_object('id', lm.id, 'conversationId', lm.conversation_id, 'body', lm.body, 'createdAt', lm.created_at, 'readBy', '[]'::jsonb) from public.messages lm where lm.conversation_id = c.id order by lm.created_at desc limit 1) as last_message
+from public.conversations c
+join public.conversation_members me on me.conversation_id = c.id and me.user_id = auth.uid()
+join public.conversation_members cm on cm.conversation_id = c.id
+join public.profiles p on p.id = cm.user_id
+left join public.messages m on m.conversation_id = c.id
+group by c.id, me.last_read_at;

@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Bell, Bookmark, CircleEllipsis, Compass, Feather, Home, Mail, Search, Settings, ShieldCheck, User, Users, Wrench, Zap } from 'lucide-react';
-import { currentProfile, demoFeed } from '@media/api';
+import type { Profile } from '@media/types';
+import { mediaRepository } from '../lib/supabase';
 import { AccountMenu } from './AccountMenu';
 import { useAuth } from './AuthProvider';
 
@@ -25,7 +27,14 @@ const staffNav = [
 export function Shell({ children, title = 'Timeline' }: { children: React.ReactNode; title?: string }) {
   const pathname = usePathname();
   const { profile } = useAuth();
+  const [trends, setTrends] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<Profile[]>([]);
   const role = profile?.role ?? 'user';
+
+  useEffect(() => {
+    void mediaRepository.getHomeFeed().then((feed) => setTrends(feed.trendingHashtags)).catch(() => setTrends([]));
+    void mediaRepository.getSuggestedProfiles().then(setSuggestions).catch(() => setSuggestions([]));
+  }, []);
   const visibleStaffNav = staffNav.filter((item) => item.roles.includes(role as never));
 
   return (
@@ -64,19 +73,19 @@ export function Shell({ children, title = 'Timeline' }: { children: React.ReactN
           </section>
           <section className="x-card">
             <h2>What’s happening</h2>
-            {demoFeed.trendingHashtags.slice(0, 5).map((tag, index) => (
+            {trends.slice(0, 5).map((tag) => (
               <Link className="x-trend" key={tag} href={`/explore?q=${encodeURIComponent(tag)}`}>
                 <span>Trending in Media</span>
                 <strong>{tag}</strong>
-                <small>{(128 - index * 17).toLocaleString()}K posts</small>
               </Link>
             ))}
+            {trends.length === 0 && <p className="muted">Trends appear as people post hashtags.</p>}
           </section>
           <section className="x-card">
             <h2>Who to follow</h2>
-            {[currentProfile, ...demoFeed.posts.map((post) => post.author)].slice(0, 3).map((person) => (
+            {suggestions.slice(0, 3).map((person) => (
               <div className="x-follow-row" key={person.id}>
-                <img className="x-avatar" src={person.avatarUrl ?? '/'} alt="" />
+                {person.avatarUrl ? <img className="x-avatar" src={person.avatarUrl} alt="" /> : <span className="x-avatar" />}
                 <div>
                   <strong>{person.displayName}</strong>
                   <span>@{person.username}</span>
@@ -84,6 +93,7 @@ export function Shell({ children, title = 'Timeline' }: { children: React.ReactN
                 <Link className="x-follow-button" href={`/u/${person.username}`}>Follow</Link>
               </div>
             ))}
+          {suggestions.length === 0 && <p className="muted">Follow suggestions appear after users join.</p>}
           </section>
           <footer className="x-rail-footer">
             <Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link>

@@ -6,7 +6,7 @@ import type { MediaAsset, Post } from '@media/types';
 import { mediaRepository } from '../lib/supabase';
 import { useAuth } from './AuthProvider';
 
-export function CreatePostForm() {
+export function CreatePostForm({ onPosted }: { onPosted?: () => void }) {
   const { session, profile } = useAuth();
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -38,6 +38,7 @@ export function CreatePostForm() {
     if (!error) {
       setBody('');
       setFiles([]);
+      onPosted?.();
     }
   }
 
@@ -72,7 +73,7 @@ export function CreatePostForm() {
   );
 }
 
-export function PostActions({ post }: { post: Post }) {
+export function PostActions({ post, onChanged }: { post: Post; onChanged?: () => void }) {
   const { profile } = useAuth();
   const [comment, setComment] = useState('');
   const [editing, setEditing] = useState(false);
@@ -83,6 +84,7 @@ export function PostActions({ post }: { post: Post }) {
   async function run(action: () => Promise<{ error: { message: string } | null }>, success = 'Saved.') {
     const { error } = await action();
     setMessage(error ? error.message : success);
+    if (!error) onChanged?.();
   }
 
   return (

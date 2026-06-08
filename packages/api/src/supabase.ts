@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Conversation, FeedBundle, MediaAsset, Message, Notification, Post, Profile, Report, Story, SupportTicket } from '@media/types';
+import type { Conversation, DashboardMetrics, FeedBundle, MediaAsset, Message, ModerationQueueItem, Notification, Post, Profile, Report, SponsoredPost, Story, SupportTicket } from '@media/types';
 
 export interface MediaApiConfig {
   supabaseUrl: string;
@@ -121,6 +121,23 @@ export class MediaRepository {
     };
   }
 
+
+  async getFollowingFeed(): Promise<Post[]> {
+    const { data: user } = await this.client.auth.getUser();
+    if (!user.user) return [];
+    const { data } = await this.client
+      .from('following_feed')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    return (data ?? []).map(mapPostFeedRow);
+  }
+
+  async getSuggestedProfiles(): Promise<Profile[]> {
+    const { data } = await this.client.from('profiles').select('*').order('followers_count', { ascending: false }).limit(5);
+    return (data ?? []).map(mapProfile);
+  }
+
   async getProfileFeed(profileId: string): Promise<Post[]> {
     const { data } = await this.client.from('post_feed').select('*').eq('author_id', profileId).order('created_at', { ascending: false });
     return (data ?? []).map(mapPostFeedRow);
@@ -201,7 +218,7 @@ export class MediaRepository {
 
   async follow(profileId: string) {
     const { data: user } = await this.client.auth.getUser();
-    return this.client.from('follows').insert({ follower_id: user.user?.id, following_id: profileId });
+    return this.client.from('follows').upsert({ follower_id: user.user?.id, following_id: profileId }, { onConflict: 'follower_id,following_id' });
   }
 
   async unfollow(profileId: string) {
@@ -217,6 +234,33 @@ export class MediaRepository {
   async viewStory(storyId: string) {
     const { data: user } = await this.client.auth.getUser();
     return this.client.from('story_views').upsert({ story_id: storyId, viewer_id: user.user?.id }, { onConflict: 'story_id,viewer_id' });
+  }
+
+
+  async getModerationQueue(): Promise<ModerationQueueItem[]> {
+    const { data } = await this.client.from('moderation_queue').select('*').order('created_at', { ascending: false }).limit(100);
+    return (data ?? []).map(mapModerationQueueItem);
+  }
+
+  async reviewModerationItem(id: string, status: 'approved' | 'rejected' | 'escalated') {
+    return this.client.from('moderation_queue').update({ status, reviewed_at: new Date().toISOString() }).eq('id', id);
+  }
+
+  async getSupportTickets(): Promise<SupportTicket[]> {
+    const { data } = await this.client.from('support_tickets').select('*').order('created_at', { ascending: false }).limit(100);
+    return (data ?? []).map(mapSupportTicket);
+  }
+
+  async getDashboardMetrics(): Promise<DashboardMetrics> {
+    const { data, error } = await this.client.rpc('get_admin_dashboard_metrics');
+    if (error || !data) return { openReports: 0, activeBans: 0, pendingModeration: 0, activeAds: 0 };
+    const row = Array.isArray(data) ? data[0] : data;
+    return { openReports: row.open_reports ?? 0, activeBans: row.active_bans ?? 0, pendingModeration: row.pending_moderation ?? 0, activeAds: row.active_ads ?? 0 };
+  }
+
+  async getSponsoredPosts(): Promise<SponsoredPost[]> {
+    const { data } = await this.client.from('sponsored_posts').select('*').order('created_at', { ascending: false }).limit(100);
+    return (data ?? []).map(mapSponsoredPost);
   }
 
   async getConversations(): Promise<Conversation[]> {
@@ -260,8 +304,9 @@ export class MediaRepository {
     return (data ?? []).map(mapNotification);
   }
 
-  report(input: Omit<Report, 'id' | 'createdAt' | 'status'>) {
-    return this.client.from('reports').insert({ reporter_id: input.reporterId, target_type: input.targetType, target_id: input.targetId, reason: input.reason });
+  async report(input: Partial<Omit<Report, 'id' | 'createdAt' | 'status'>> & Pick<Report, 'targetType' | 'targetId' | 'reason'>) {
+    const { data: user } = await this.client.auth.getUser();
+    return this.client.from('reports').insert({ reporter_id: input.reporterId ?? user.user?.id, target_type: input.targetType, target_id: input.targetId, reason: input.reason });
   }
 
   async blockUser(blockedId: string) {
@@ -312,4 +357,16 @@ function mapConversationRow(row: any): Conversation {
 
 function mapNotification(row: any): Notification {
   return { id: row.id, userId: row.user_id, type: row.type, title: row.title, body: row.body, readAt: row.read_at, createdAt: row.created_at };
+}
+
+function mapModerationQueueItem(row: any): ModerationQueueItem {
+  return { id: row.id, targetType: row.target_type, targetId: row.target_id, status: row.status, aiScore: row.ai_score, aiReason: row.ai_reason, assignedTo: row.assigned_to, createdAt: row.created_at };
+}
+
+function mapSupportTicket(row: any): SupportTicket {
+  return { id: row.id, requesterId: row.requester_id, subject: row.subject, message: row.message, status: row.status, assigneeId: row.assignee_id, createdAt: row.created_at };
+}
+
+function mapSponsoredPost(row: any): SponsoredPost {
+  return { id: row.id, postId: row.post_id, sponsorName: row.sponsor_name, status: row.status, startsAt: row.starts_at, endsAt: row.ends_at, pinned: row.pinned, budgetCents: row.budget_cents ?? 0 };
 }

@@ -7,9 +7,9 @@ Media is a full-stack social media platform monorepo for iOS, Android, desktop w
 - `apps/mobile` — Expo React Native app for iOS and Android with persisted Supabase sessions, protected mobile tabs, feed, stories, DMs, notifications, profile, support, and moderation surfaces.
 - `apps/web` — Next.js responsive desktop/web app with protected routes, X-like sidebar/feed/trending layout, auth, public profiles, edit profile, dashboards, DMs, notifications, safety flows, and legal/delete-account pages.
 - `packages/types` — Shared TypeScript domain and database-facing types.
-- `packages/api` — Shared Supabase repository plus placeholder live streaming, push/email delivery, and AI moderation services.
+- `packages/api` — Shared Supabase repository plus production integration adapters for live streaming, push/email delivery, and AI moderation services.
 - `packages/design-system` — Shared dark-mode-ready color, spacing, radius, typography, shadow, and button tokens.
-- `supabase/schema.sql` — Postgres schema, Auth signup trigger, views, relationships, indexes, triggers, RLS enablement, starter policies, and useful demo seed hooks.
+- `supabase/schema.sql` — Postgres schema, Auth signup trigger, views, relationships, indexes, triggers, RLS enablement, policies, storage setup, auto-moderation triggers, advertising tables, and operational views.
 
 ## Requirements
 
@@ -44,7 +44,7 @@ Apply `supabase/schema.sql` in the Supabase SQL editor or with the Supabase CLI.
 - Posts, media, comments, likes, reposts, quote posts, bookmarks, follows, feeds, and trending hashtags.
 - Stories with 24-hour expiration and story views.
 - 1-on-1/group conversations, messages, read receipts, and typing indicators.
-- In-app notifications and device tokens for Expo/APNS/FCM placeholders.
+- In-app notifications and device tokens for Expo/APNS/FCM delivery adapters.
 - Reports, blocks, mutes, support tickets, appeals, bans, admin actions, and moderation queue.
 - RLS policies for users, content owners, conversation members, ticket participants, and staff roles.
 
@@ -63,11 +63,11 @@ The web app runs with protected Next.js routes and client-side Supabase session 
 
 ## External integration TODOs
 
-The code intentionally keeps only real external-provider TODOs as placeholders:
+External provider adapters are configured through environment variables:
 
-- Replace `packages/api/src/services.ts` live streaming placeholders with a provider such as Mux, LiveKit, or Amazon IVS.
-- Replace `packages/api/src/services.ts` AI moderation placeholders with a production moderation API.
-- Replace push/email placeholders with production Expo/APNS/FCM and transactional email providers.
+- `MEDIA_LIVE_STREAM_WEBHOOK_URL` for live stream provisioning.
+- `MEDIA_AI_MODERATION_URL` for managed AI moderation, with a Supabase heuristic fallback.
+- `MEDIA_PUSH_WEBHOOK_URL` and `MEDIA_EMAIL_WEBHOOK_URL` for push and transactional email delivery.
 - Add payment/subscription providers only if Media introduces paid creator or premium features.
 
 ## Useful commands
