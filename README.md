@@ -58,12 +58,13 @@ The web app runs the OpenDev desktop dashboard. The mobile app runs a native Ope
 ```bash
 npm run build:desktop
 npm run build:ios
+npm run build:ios:testflight
 npm run build:ios:preview
 npm run build:ios:simulator
 npm run submit:ios
 ```
 
-The iOS build and submit commands require EAS CLI access, an Expo account, Apple Developer credentials, and App Store Connect setup. See `docs/APPLE_STORE_CONNECT.md` for the OpenDev connection workflow.
+The iOS build and submit commands require EAS CLI access, an Expo account, Apple Developer credentials, and App Store Connect setup. See `docs/APPLE_STORE_CONNECT.md` for the OpenDev connection workflow and `docs/TESTFLIGHT_BUILD.md` for submitting the first TestFlight build.
 
 ## External integration TODOs
 

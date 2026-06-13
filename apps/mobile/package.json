@@ -13,7 +13,8 @@
     "build:ios:simulator": "eas build --platform ios --profile ios-simulator",
     "submit:ios": "eas submit --platform ios --profile production",
     "check:apple-connect": "node ../../scripts/check-apple-connect.mjs",
-    "connect:apple": "eas submit:configure --platform ios"
+    "connect:apple": "eas submit:configure --platform ios",
+    "build:ios:testflight": "eas build --platform ios --profile production --auto-submit"
   },
   "dependencies": {
     "@opendev/api": "0.1.0",

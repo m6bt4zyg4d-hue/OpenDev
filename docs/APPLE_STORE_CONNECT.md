@@ -57,6 +57,12 @@ When prompted, choose the OpenDev App Store Connect app and API key. EAS will st
 ## 6. Build and submit
 
 ```bash
+npm run build:ios:testflight
+```
+
+Or build and submit separately:
+
+```bash
 npm run build:ios
 npm run submit:ios
 ```
