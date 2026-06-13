@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Bell, Bookmark, CircleEllipsis, Compass, Feather, Home, Mail, Search, Settings, ShieldCheck, User, Users, Wrench, Zap } from 'lucide-react';
-import type { Profile } from '@media/types';
+import type { Profile } from '@opendev/types';
 import { mediaRepository } from '../lib/supabase';
 import { AccountMenu } from './AccountMenu';
 import { useAuth } from './AuthProvider';
@@ -41,7 +41,7 @@ export function Shell({ children, title = 'Timeline' }: { children: React.ReactN
     <main className="x-app-shell">
       <aside className="x-left-rail" aria-label="Primary">
         <div className="x-left-inner">
-          <Link className="x-logo" href="/" aria-label="Media home"><Zap size={30} /></Link>
+          <Link className="x-logo" href="/" aria-label="OpenDev home"><Zap size={30} /></Link>
           <nav className="x-nav" aria-label="Main navigation">
             {primaryNav.map(({ label, href, icon: Icon }) => (
               <Link key={href} className={pathname === href ? 'is-active' : ''} href={href}>
@@ -75,7 +75,7 @@ export function Shell({ children, title = 'Timeline' }: { children: React.ReactN
             <h2>What’s happening</h2>
             {trends.slice(0, 5).map((tag) => (
               <Link className="x-trend" key={tag} href={`/explore?q=${encodeURIComponent(tag)}`}>
-                <span>Trending in Media</span>
+                <span>Trending in OpenDev</span>
                 <strong>{tag}</strong>
               </Link>
             ))}

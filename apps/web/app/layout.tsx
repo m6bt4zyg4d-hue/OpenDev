@@ -3,8 +3,8 @@ import { AuthProvider } from '../components/AuthProvider';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Media',
-  description: 'A full social media platform for creators, communities, live streams, and moderation teams.'
+  title: 'OpenDev',
+  description: 'An AI-powered software development platform for building, hosting, deploying, and publishing apps.'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

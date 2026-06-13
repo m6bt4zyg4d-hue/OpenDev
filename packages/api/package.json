@@ -1,12 +1,12 @@
 {
-  "name": "@media/api",
+  "name": "@opendev/api",
   "version": "0.1.0",
   "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
-    "@media/types": "0.1.0"
+    "@opendev/types": "0.1.0"
   },
   "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" }
 }

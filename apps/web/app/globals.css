@@ -192,3 +192,62 @@ img, video { max-width: 100%; }
   .x-mobile-compose { position: fixed; z-index: 21; right: 18px; bottom: 82px; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--x-blue); color: white; box-shadow: 0 8px 24px rgba(29,155,240,.35); }
 }
 .form-message { color: var(--x-muted); margin: 8px 0 0; }
+
+/* OpenDev SaaS platform experience */
+.opendev-shell { min-height: 100vh; background: radial-gradient(circle at top left, rgba(38, 92, 255, .28), transparent 34rem), radial-gradient(circle at 80% 10%, rgba(168, 85, 247, .22), transparent 28rem), #050713; color: #f8fbff; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.opendev-shell a { color: inherit; }
+.opendev-hero, .opendev-section { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+.opendev-hero { padding: 24px 0 72px; }
+.opendev-topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 16px; border: 1px solid rgba(148, 163, 184, .22); border-radius: 22px; background: rgba(8, 13, 28, .72); backdrop-filter: blur(18px); box-shadow: 0 20px 80px rgba(0,0,0,.32); }
+.opendev-brand, .opendev-actions, .opendev-navlinks, .opendev-card button, .opendev-primary, .opendev-secondary, .opendev-cta { display: inline-flex; align-items: center; gap: 10px; }
+.opendev-brand { font-weight: 900; letter-spacing: -.03em; font-size: 20px; }
+.opendev-navlinks { gap: 20px; color: #b8c4d9; font-size: 14px; }
+.opendev-cta, .opendev-primary, .opendev-secondary, .opendev-wizard button, .opendev-card button { border: 1px solid rgba(125, 158, 255, .45); border-radius: 999px; padding: 10px 16px; background: linear-gradient(135deg, #4776ff, #8b5cf6); color: white; font-weight: 800; box-shadow: 0 16px 40px rgba(71, 118, 255, .22); }
+.opendev-hero-grid, .opendev-two-col { display: grid; grid-template-columns: 1.08fr .92fr; gap: 34px; align-items: center; }
+.opendev-hero-grid { padding-top: 76px; }
+.opendev-kicker, .opendev-section-heading p { color: #76e4ff; font-weight: 900; letter-spacing: .14em; font-size: 12px; text-transform: uppercase; }
+.opendev-hero h1 { margin: 12px 0 18px; font-size: clamp(44px, 7vw, 86px); line-height: .92; letter-spacing: -.08em; }
+.opendev-lede { max-width: 670px; color: #c7d2e6; font-size: 20px; line-height: 1.6; }
+.opendev-actions { margin-top: 28px; flex-wrap: wrap; }
+.opendev-secondary { background: rgba(15, 23, 42, .72); border-color: rgba(148, 163, 184, .28); }
+.opendev-command-card, .opendev-card, .opendev-wizard, .opendev-studio, .opendev-pricing article, .opendev-roadmap article, .opendev-checklist { border: 1px solid rgba(148, 163, 184, .2); background: linear-gradient(180deg, rgba(15, 23, 42, .9), rgba(8, 13, 28, .86)); border-radius: 28px; box-shadow: 0 24px 80px rgba(0, 0, 0, .34); }
+.opendev-command-card { padding: 22px; min-height: 320px; display: grid; align-content: center; gap: 20px; }
+.opendev-window-bar { display: flex; gap: 8px; }
+.opendev-window-bar span { width: 12px; height: 12px; border-radius: 999px; background: #ef4444; }
+.opendev-window-bar span:nth-child(2) { background: #f59e0b; } .opendev-window-bar span:nth-child(3) { background: #22c55e; }
+.opendev-command-card code { display: block; color: #dbeafe; font-size: 18px; line-height: 1.7; }
+.opendev-progress { height: 10px; border-radius: 999px; background: rgba(148, 163, 184, .18); overflow: hidden; }
+.opendev-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #22d3ee, #4776ff, #a855f7); }
+.opendev-section { padding: 54px 0; }
+.opendev-section-heading { max-width: 760px; margin-bottom: 24px; }
+.opendev-section h2 { margin: 8px 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -.055em; }
+.opendev-dashboard-grid, .opendev-agent-grid, .opendev-three-col, .opendev-pricing { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.opendev-card { padding: 22px; transition: transform .18s ease, border-color .18s ease; }
+.opendev-card:hover { transform: translateY(-3px); border-color: rgba(118, 228, 255, .55); }
+.opendev-card svg { color: #76e4ff; }
+.opendev-card h3, .opendev-pricing h3 { margin: 14px 0 8px; font-size: 20px; }
+.opendev-card p, .opendev-muted, .opendev-command-card p, .opendev-roadmap p, .opendev-pricing p { color: #aab8cf; line-height: 1.55; }
+.opendev-chip-grid, .opendev-prompts { display: flex; flex-wrap: wrap; gap: 10px; }
+.opendev-chip-grid span, .opendev-prompts span, .opendev-tabs b, .opendev-studio aside span, .opendev-studio footer span { border: 1px solid rgba(148, 163, 184, .22); background: rgba(15, 23, 42, .72); border-radius: 999px; padding: 9px 13px; color: #d9e6fb; }
+.opendev-wizard { padding: 22px; display: grid; gap: 13px; }
+.opendev-wizard label { display: grid; gap: 7px; color: #b8c4d9; font-weight: 700; }
+.opendev-wizard input { width: 100%; border: 1px solid rgba(148, 163, 184, .22); border-radius: 14px; padding: 12px 13px; background: rgba(2, 6, 23, .66); color: white; }
+.opendev-studio { display: grid; grid-template-columns: 190px 1fr; overflow: hidden; }
+.opendev-studio aside { padding: 18px; display: grid; align-content: start; gap: 10px; border-right: 1px solid rgba(148, 163, 184, .18); }
+.opendev-editor { padding: 18px; }
+.opendev-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.opendev-editor pre { margin: 0; min-height: 260px; border-radius: 20px; padding: 22px; background: #020617; color: #bfdbfe; overflow: auto; line-height: 1.7; }
+.opendev-preview { margin-top: 16px; min-height: 120px; border-radius: 20px; display: grid; place-items: center; gap: 8px; border: 1px dashed rgba(118, 228, 255, .4); color: #dbeafe; }
+.opendev-studio footer { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 18px; border-top: 1px solid rgba(148, 163, 184, .18); }
+.opendev-checklist { padding: 22px; display: grid; gap: 14px; }
+.opendev-checklist p, .opendev-roadmap article { display: flex; gap: 10px; align-items: flex-start; margin: 0; color: #dbeafe; }
+.opendev-checklist svg { color: #22c55e; flex: none; }
+.opendev-progress.big { margin: 22px 0 12px; height: 14px; }
+.opendev-roadmap { display: grid; gap: 12px; }
+.opendev-roadmap article { padding: 16px; display: grid; grid-template-columns: auto 1fr; }
+.opendev-roadmap article p { grid-column: 2; margin: 0; }
+.opendev-pricing article { padding: 28px; }
+.opendev-pricing strong { display: block; font-size: 34px; letter-spacing: -.04em; }
+.opendev-pricing .featured { border-color: rgba(118, 228, 255, .68); background: linear-gradient(180deg, rgba(30, 64, 175, .55), rgba(15, 23, 42, .92)); transform: scale(1.03); }
+.opendev-footer { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 56px; color: #aab8cf; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+@media (max-width: 860px) { .opendev-navlinks { display: none; } .opendev-hero-grid, .opendev-two-col, .opendev-dashboard-grid, .opendev-agent-grid, .opendev-three-col, .opendev-pricing, .opendev-studio { grid-template-columns: 1fr; } .opendev-studio aside { border-right: 0; border-bottom: 1px solid rgba(148, 163, 184, .18); } .opendev-pricing .featured { transform: none; } }

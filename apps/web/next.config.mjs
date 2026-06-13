@@ -1,3 +1,3 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = { transpilePackages: ['@media/api', '@media/types', '@media/design-system'] };
+const nextConfig = { transpilePackages: ['@opendev/api', '@opendev/types', '@opendev/design-system'] };
 export default nextConfig;

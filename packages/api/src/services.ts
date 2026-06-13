@@ -1,4 +1,4 @@
-import type { ModerationQueueItem, Notification } from '@media/types';
+import type { ModerationQueueItem, Notification } from '@opendev/types';
 
 export interface PushPayload {
   to: string;
@@ -18,7 +18,7 @@ export const pushNotifications = {
     return { userId, expoPushToken, provider: 'expo', registered: true };
   },
   async send(payload: PushPayload) {
-    const endpoint = requireEndpoint('MEDIA_PUSH_WEBHOOK_URL');
+    const endpoint = requireEndpoint('OPENDEV_PUSH_WEBHOOK_URL');
     const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
     if (!response.ok) throw new Error(`Push provider failed with ${response.status}`);
     return response.json();
@@ -27,7 +27,7 @@ export const pushNotifications = {
 
 export const emailNotifications = {
   async send(notification: Notification & { email: string }) {
-    const endpoint = requireEndpoint('MEDIA_EMAIL_WEBHOOK_URL');
+    const endpoint = requireEndpoint('OPENDEV_EMAIL_WEBHOOK_URL');
     const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(notification) });
     if (!response.ok) throw new Error(`Email provider failed with ${response.status}`);
     return response.json();
@@ -36,7 +36,7 @@ export const emailNotifications = {
 
 export const aiModeration = {
   async reviewText(targetType: ModerationQueueItem['targetType'], targetId: string, text: string) {
-    const endpoint = process.env.MEDIA_AI_MODERATION_URL;
+    const endpoint = process.env.OPENDEV_AI_MODERATION_URL;
     if (endpoint) {
       const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ targetType, targetId, text }) });
       if (!response.ok) throw new Error(`AI moderation provider failed with ${response.status}`);
@@ -56,13 +56,13 @@ export const aiModeration = {
 
 export const liveStreaming = {
   async createStream(hostId: string, title: string) {
-    const endpoint = requireEndpoint('MEDIA_LIVE_STREAM_WEBHOOK_URL');
+    const endpoint = requireEndpoint('OPENDEV_LIVE_STREAM_WEBHOOK_URL');
     const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ hostId, title }) });
     if (!response.ok) throw new Error(`Live streaming provider failed with ${response.status}`);
     return response.json();
   },
   async endStream(streamId: string) {
-    const endpoint = requireEndpoint('MEDIA_LIVE_STREAM_WEBHOOK_URL');
+    const endpoint = requireEndpoint('OPENDEV_LIVE_STREAM_WEBHOOK_URL');
     const response = await fetch(`${endpoint}/${streamId}/end`, { method: 'POST' });
     if (!response.ok) throw new Error(`Live streaming provider failed with ${response.status}`);
     return response.json();

@@ -17,13 +17,13 @@
     "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "paths": {
-      "@media/types": [
+      "@opendev/types": [
         "packages/types/src"
       ],
-      "@media/api": [
+      "@opendev/api": [
         "packages/api/src"
       ],
-      "@media/design-system": [
+      "@opendev/design-system": [
         "packages/design-system/src"
       ]
     }

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import type { Profile } from '@media/types';
+import type { Profile } from '@opendev/types';
 import { mediaRepository, supabase } from '../lib/supabase';
 
 interface AuthContextValue {

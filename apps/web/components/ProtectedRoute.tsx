@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import type { Role } from '@media/types';
+import type { Role } from '@opendev/types';
 import { ShieldAlert } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 

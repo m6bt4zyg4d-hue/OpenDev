@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Image as ImageIcon, MoreHorizontal } from 'lucide-react';
-import type { FeedBundle, MediaAsset, Post } from '@media/types';
+import type { FeedBundle, MediaAsset, Post } from '@opendev/types';
 import { mediaRepository } from '../lib/supabase';
 import { CreatePostForm, PostActions } from './SocialActions';
 

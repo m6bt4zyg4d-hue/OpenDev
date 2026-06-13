@@ -1,5 +1,5 @@
 {
-  "name": "@media/design-system",
+  "name": "@opendev/design-system",
   "version": "0.1.0",
   "private": true,
   "main": "src/index.ts",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
-import type { FeedBundle, Profile } from '@media/types';
+import type { FeedBundle, Profile } from '@opendev/types';
 import { mediaRepository } from '../lib/supabase';
 import { PostList } from './Feed';
 

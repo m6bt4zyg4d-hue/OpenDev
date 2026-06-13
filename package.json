@@ -1,13 +1,18 @@
 {
-  "name": "media-monorepo",
+  "name": "opendev-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "Media social platform monorepo for mobile, web, shared packages, and Supabase backend.",
+  "description": "OpenDev AI software development platform monorepo for mobile, desktop web, shared packages, and Supabase backend.",
   "scripts": {
     "dev:web": "npm --workspace apps/web run dev",
     "dev:mobile": "npm --workspace apps/mobile run start",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present"
+    "lint": "npm run lint --workspaces --if-present",
+    "build:desktop": "npm --workspace apps/web run build",
+    "build:ios": "npm --workspace apps/mobile run build:ios",
+    "build:ios:preview": "npm --workspace apps/mobile run build:ios:preview",
+    "build:ios:simulator": "npm --workspace apps/mobile run build:ios:simulator",
+    "submit:ios": "npm --workspace apps/mobile run submit:ios"
   },
   "workspaces": [
     "apps/*",

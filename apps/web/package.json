@@ -1,5 +1,5 @@
 {
-  "name": "@media/web",
+  "name": "@opendev/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,9 +9,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@media/api": "0.1.0",
-    "@media/design-system": "0.1.0",
-    "@media/types": "0.1.0",
+    "@opendev/api": "0.1.0",
+    "@opendev/design-system": "0.1.0",
+    "@opendev/types": "0.1.0",
     "@supabase/supabase-js": "^2.45.4",
     "lucide-react": "^1.17.0",
     "next": "^14.2.5",

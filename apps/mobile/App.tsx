@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { colors } from '@media/design-system';
-import type { Conversation, FeedBundle, ModerationQueueItem, Notification, Post, Profile, SupportTicket } from '@media/types';
+import { colors } from '@opendev/design-system';
+import type { Conversation, FeedBundle, ModerationQueueItem, Notification, Post, Profile, SupportTicket } from '@opendev/types';
 import { mobileRepository, supabase } from './src/lib/supabase';
 
 type Tab = 'Auth' | 'Home' | 'Explore' | 'Post' | 'Stories' | 'DMs' | 'Alerts' | 'Profile' | 'Admin';
@@ -30,7 +30,7 @@ export default function App() {
       default: return <HomeScreen />;
     }
   }, [tab, hasSession]);
-  return <SafeAreaView style={styles.app}><StatusBar style="light" /><View style={styles.header}><Text style={styles.logo}>Media</Text><TouchableOpacity style={styles.liveButton}><Text style={styles.liveText}>Go Live</Text></TouchableOpacity></View>{content}<View style={styles.tabbar}>{(['Auth','Home','Explore','Post','Stories','DMs','Alerts','Profile','Admin'] as Tab[]).map((item) => <TouchableOpacity key={item} onPress={() => setTab(item)} style={[styles.tab, tab === item && styles.activeTab]}><Text style={styles.tabText}>{item}</Text></TouchableOpacity>)}</View></SafeAreaView>;
+  return <SafeAreaView style={styles.app}><StatusBar style="light" /><View style={styles.header}><Text style={styles.logo}>OpenDev</Text><TouchableOpacity style={styles.liveButton}><Text style={styles.liveText}>Go Live</Text></TouchableOpacity></View>{content}<View style={styles.tabbar}>{(['Auth','Home','Explore','Post','Stories','DMs','Alerts','Profile','Admin'] as Tab[]).map((item) => <TouchableOpacity key={item} onPress={() => setTab(item)} style={[styles.tab, tab === item && styles.activeTab]}><Text style={styles.tabText}>{item}</Text></TouchableOpacity>)}</View></SafeAreaView>;
 }
 
 
@@ -59,9 +59,9 @@ function HomeScreen() { return <ScrollView><StoryRail /><ComposerCard /><PostCar
 function ExploreScreen() {
   const [feed, setFeed] = useState<FeedBundle>({ stories: [], posts: [], trendingHashtags: [] });
   useEffect(() => { void mobileRepository.getHomeFeed().then(setFeed); }, []);
-  return <ScrollView><TextInput style={styles.search} placeholder="Search people, posts, and hashtags" placeholderTextColor={colors.muted} />{feed.trendingHashtags.map((tag) => <Card key={tag}><Text style={styles.title}>{tag}</Text><Text style={styles.muted}>Trending now across Media</Text></Card>)}<PostCards posts={feed.posts} /></ScrollView>;
+  return <ScrollView><TextInput style={styles.search} placeholder="Search people, posts, and hashtags" placeholderTextColor={colors.muted} />{feed.trendingHashtags.map((tag) => <Card key={tag}><Text style={styles.title}>{tag}</Text><Text style={styles.muted}>Trending now across OpenDev</Text></Card>)}<PostCards posts={feed.posts} /></ScrollView>;
 }
-function ComposerScreen() { return <ScrollView><ComposerCard expanded /><Card><Text style={styles.title}>Camera & media picker</Text><Text style={styles.muted}>Use Expo Camera and ImagePicker permissions configured in app.json to capture images, videos, stories, and live previews.</Text><View style={styles.row}><Chip label="Open camera" /><Chip label="Pick media" /><Chip label="AI pre-check" /></View></Card></ScrollView>; }
+function ComposerScreen() { return <ScrollView><ComposerCard expanded /><Card><Text style={styles.title}>Project asset picker</Text><Text style={styles.muted}>Use Expo Camera and ImagePicker permissions configured in app.json to capture screenshots, videos, app previews, and design assets.</Text><View style={styles.row}><Chip label="Open camera" /><Chip label="Pick media" /><Chip label="AI pre-check" /></View></Card></ScrollView>; }
 function StoriesScreen() { return <ScrollView><StoryRail large /><Card><Text style={styles.title}>Create story</Text><Text style={styles.muted}>Stories expire after 24 hours and track story views.</Text><Chip label="Add photo/video story" /></Card></ScrollView>; }
 function MessagesScreen() { const [items, setItems] = useState<Conversation[]>([]); useEffect(() => { void mobileRepository.getConversations().then(setItems); }, []); return <ScrollView>{items.length === 0 ? <Empty label="No direct messages yet." /> : items.map((dm) => <Card key={dm.id}><Text style={styles.title}>{dm.title ?? dm.participants[0]?.displayName}</Text><Text>{dm.lastMessage?.body}</Text><Text style={styles.muted}>{dm.isGroup ? 'Group chat' : '1-on-1'} · {dm.unreadCount} unread</Text></Card>)}</ScrollView>; }
 function NotificationsScreen() { const [items, setItems] = useState<Notification[]>([]); useEffect(() => { void mobileRepository.getNotifications().then(setItems); }, []); return <ScrollView>{items.length === 0 ? <Empty label="No notifications yet." /> : items.map((n) => <Card key={n.id}><Text style={styles.title}>{n.title}</Text><Text>{n.body}</Text><Text style={styles.muted}>{n.type} · {n.readAt ? 'Read' : 'Unread'}</Text></Card>)}</ScrollView>; }

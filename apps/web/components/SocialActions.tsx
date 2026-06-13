@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { BarChart3, Bookmark, Heart, Image as ImageIcon, MessageCircle, Repeat2, Send, Share, Smile, Trash2, X } from 'lucide-react';
-import type { MediaAsset, Post } from '@media/types';
+import type { MediaAsset, Post } from '@opendev/types';
 import { mediaRepository } from '../lib/supabase';
 import { useAuth } from './AuthProvider';
 
@@ -100,7 +100,7 @@ export function PostActions({ post, onChanged }: { post: Post; onChanged?: () =>
         <button className="repost" onClick={() => void run(() => mediaRepository.repost(post.id), 'Reposted.')}><Repeat2 size={18} /><span>{post.repostCount}</span></button>
         <button className="like" onClick={() => void run(() => mediaRepository.likePost(post.id), 'Liked.')}><Heart size={18} /><span>{post.likeCount}</span></button>
         <button className="bookmark" onClick={() => void run(() => mediaRepository.bookmark(post.id), 'Bookmarked.')}><Bookmark size={18} /><span>{post.bookmarkCount}</span></button>
-        <button onClick={() => navigator.share?.({ title: 'Media post', text: post.body, url: window.location.href })}><Share size={18} /></button>
+        <button onClick={() => navigator.share?.({ title: 'OpenDev post', text: post.body, url: window.location.href })}><Share size={18} /></button>
         <span className="x-analytics"><BarChart3 size={18} /> {Math.max(post.likeCount * 3, 1200).toLocaleString()}</span>
         {isOwner && <button onClick={() => setEditing((value) => !value)}>Edit</button>}
         {isOwner && <button className="delete" onClick={() => void run(() => mediaRepository.deleteOwnPost(post.id), 'Deleted.')}><Trash2 size={18} /></button>}

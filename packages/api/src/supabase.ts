@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Conversation, DashboardMetrics, FeedBundle, MediaAsset, Message, ModerationQueueItem, Notification, Post, Profile, Report, SponsoredPost, Story, SupportTicket } from '@media/types';
+import type { Conversation, DashboardMetrics, FeedBundle, MediaAsset, Message, ModerationQueueItem, Notification, Post, Profile, Report, SponsoredPost, Story, SupportTicket } from '@opendev/types';
 
 export interface MediaApiConfig {
   supabaseUrl: string;

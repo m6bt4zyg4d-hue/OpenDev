@@ -1,6 +1,6 @@
-# Media
+# OpenDev
 
-Media is a full-stack social media platform monorepo for iOS, Android, desktop web, and Supabase. It includes a working Supabase Auth foundation, cross-platform social screens, shared strict TypeScript packages, and a production-oriented database schema for feeds, stories, DMs, notifications, safety, support, and moderation.
+OpenDev is a full-stack AI software development platform monorepo for iOS, Android, desktop web, and Supabase. It includes a working Supabase Auth foundation, cross-platform social screens, shared strict TypeScript packages, and a production-oriented database schema for feeds, stories, DMs, notifications, safety, support, and moderation.
 
 ## Workspace layout
 
@@ -65,10 +65,10 @@ The web app runs with protected Next.js routes and client-side Supabase session 
 
 External provider adapters are configured through environment variables:
 
-- `MEDIA_LIVE_STREAM_WEBHOOK_URL` for live stream provisioning.
-- `MEDIA_AI_MODERATION_URL` for managed AI moderation, with a Supabase heuristic fallback.
-- `MEDIA_PUSH_WEBHOOK_URL` and `MEDIA_EMAIL_WEBHOOK_URL` for push and transactional email delivery.
-- Add payment/subscription providers only if Media introduces paid creator or premium features.
+- `OPENDEV_LIVE_STREAM_WEBHOOK_URL` for live stream provisioning.
+- `OPENDEV_AI_MODERATION_URL` for managed AI moderation, with a Supabase heuristic fallback.
+- `OPENDEV_PUSH_WEBHOOK_URL` and `OPENDEV_EMAIL_WEBHOOK_URL` for push and transactional email delivery.
+- Add payment/subscription providers only if OpenDev introduces paid AI, hosting, or premium features.
 
 ## Useful commands
 

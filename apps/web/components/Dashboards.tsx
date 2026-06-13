@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import type { Conversation, DashboardMetrics, ModerationQueueItem, Notification, SponsoredPost, SupportTicket } from '@media/types';
+import type { Conversation, DashboardMetrics, ModerationQueueItem, Notification, SponsoredPost, SupportTicket } from '@opendev/types';
 import { mediaRepository } from '../lib/supabase';
 
 function ActionButton({ children, onClick }: { children: React.ReactNode; onClick?: () => Promise<void> | void }) {

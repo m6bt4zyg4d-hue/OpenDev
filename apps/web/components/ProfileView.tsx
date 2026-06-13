@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CalendarDays, Flag, Link as LinkIcon, MapPin, MoreHorizontal, VolumeX } from 'lucide-react';
-import type { Profile } from '@media/types';
+import type { Profile } from '@opendev/types';
 import { mediaRepository } from '../lib/supabase';
 import { useAuth } from './AuthProvider';
 import { PostList } from './Feed';
@@ -42,7 +42,7 @@ function ProfileHeader({ profile, ownProfile, onFollow, message }: { profile: Pr
           <h2>{profile.displayName} {profile.verified && <span className="x-verified">✓</span>}</h2>
           <p className="x-handle">@{profile.username}</p>
           <p className="x-bio">{profile.bio}</p>
-          <div className="x-profile-meta">{profile.location && <span><MapPin size={16} /> {profile.location}</span>}{profile.website && <span><LinkIcon size={16} /> {profile.website}</span>}<span><CalendarDays size={16} /> Joined Media</span></div>
+          <div className="x-profile-meta">{profile.location && <span><MapPin size={16} /> {profile.location}</span>}{profile.website && <span><LinkIcon size={16} /> {profile.website}</span>}<span><CalendarDays size={16} /> Joined OpenDev</span></div>
           <div className="x-profile-stats"><a><strong>{profile.followingCount.toLocaleString()}</strong> Following</a><a><strong>{profile.followersCount.toLocaleString()}</strong> Followers</a></div>
           {message && <p className="muted">{message}</p>}
         </div>
